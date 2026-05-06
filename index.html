@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gaurav Waghmare · Cloud & DevOps Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #0b0f14;
+    --surface:   #111820;
+    --border:    #1e2d3d;
+    --accent:    #00d4aa;
+    --accent2:   #0ea5e9;
+    --muted:     #4a6b8a;
+    --text:      #cdd9e5;
+    --text-dim:  #7a9ab8;
+    --mono:      'JetBrains Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── Grid noise overlay ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── Ambient glow ─── */
+  .glow-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glow-orb.one {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,212,170,0.12) 0%, transparent 70%);
+    top: -100px; left: -100px;
+  }
+  .glow-orb.two {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(14,165,233,0.10) 0%, transparent 70%);
+    bottom: 0; right: -80px;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2.5rem;
+    background: rgba(11,15,20,0.82);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .nav-logo span { color: var(--text-dim); }
+
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 7rem 2.5rem 4rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.2s;
+  }
+  .hero-badge::before {
+    content: '';
+    display: block;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.35s;
+  }
+
+  .hero h1 .line-accent {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--text-dim);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.5s;
+  }
+
+  .hero-sub .location { color: var(--accent2); }
+
+  .hero-desc {
+    max-width: 620px;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--text-dim);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.65s;
+  }
+
+  .cta-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.8s;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--accent);
+    color: #0b0f14;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.85rem 1.8rem;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 24px rgba(0,212,170,0.3);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 40px rgba(0,212,170,0.5);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    padding: 0.85rem 1.8rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .btn-icon { font-size: 1.1rem; }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .stat-item {
+    flex: 1;
+    max-width: 220px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item:nth-child(1) { animation-delay: 0.9s; }
+  .stat-item:nth-child(2) { animation-delay: 1.05s; }
+  .stat-item:nth-child(3) { animation-delay: 1.2s; }
+  .stat-item:nth-child(4) { animation-delay: 1.35s; }
+
+  .stat-number {
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.25rem;
+  }
+
+  /* ─── SECTIONS ─── */
+  section {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 5rem 2.5rem;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.6rem;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 3rem;
+    color: var(--text);
+  }
+
+  /* ─── SKILLS ─── */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+
+  .skill-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.4rem 1.5rem;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .skill-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+  }
+
+  .skill-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-bottom: 1rem;
+  }
+
+  .skill-icon {
+    width: 32px; height: 32px;
+    background: rgba(0,212,170,0.1);
+    border: 1px solid rgba(0,212,170,0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+
+  .skill-card-title {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 0.25rem 0.65rem;
+    border-radius: 3px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ─── FEATURED PROJECT ─── */
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.25s;
+  }
+  .project-card:hover { border-color: var(--accent2); }
+
+  .project-card-accent {
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .project-body {
+    padding: 2rem 2.2rem;
+  }
+
+  .project-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .project-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+  }
+
+  .project-subtitle {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  .project-desc {
+    color: var(--text-dim);
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .project-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .feature-item::before {
+    content: '▸';
+    color: var(--accent);
+  }
+
+  .project-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    background: rgba(0,212,170,0.08);
+    border: 1px solid rgba(0,212,170,0.2);
+    color: var(--accent);
+    padding: 0.25rem 0.65rem;
+    border-radius: 3px;
+  }
+
+  /* ─── GITHUB CTA BANNER ─── */
+  .github-banner {
+    position: relative; z-index: 1;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .github-banner-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 4rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .banner-text h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .banner-text p {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+  }
+
+  /* ─── CONTACT ─── */
+  .contact-grid {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.4rem;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .contact-item:hover { border-color: var(--accent); color: var(--accent); }
+  .contact-item .ci-icon { font-size: 1.1rem; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 680px) {
+    nav { padding: 1rem 1.2rem; }
+    .nav-links { gap: 1.2rem; }
+    .hero { padding: 6rem 1.2rem 3rem; }
+    section { padding: 3.5rem 1.2rem; }
+    .project-features { grid-template-columns: 1fr; }
+    .stats-bar { flex-wrap: wrap; }
+    .stat-item { max-width: 50%; border-right: none; border-bottom: 1px solid var(--border); }
+    .github-banner-inner { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-orb one"></div>
+<div class="glow-orb two"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>~/</span>gaurav-devops.site</div>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="https://github.com/gwaghmare8" target="_blank" rel="noopener">GitHub ↗</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Available for new opportunities · Stamp 4</div>
+  <h1>
+    Gaurav<br/>
+    <span class="line-accent">Waghmare</span>
+  </h1>
+  <p class="hero-sub">
+    Cloud &amp; Infrastructure Engineer&nbsp;&nbsp;·&nbsp;&nbsp;
+    <span class="location">📍 Dublin, Ireland</span>
+  </p>
+  <p class="hero-desc">
+    6+ years in cloud infrastructure, SaaS support, and DevOps automation. AWS Certified.
+    Building production-grade systems with Terraform, Ansible, CloudWatch, and CI/CD pipelines.
+    Explore my live demo projects below.
+  </p>
+  <div class="cta-group">
+    <a href="https://github.com/gwaghmare8" target="_blank" rel="noopener" class="btn-primary">
+      <span class="btn-icon">🐙</span> View GitHub Repos
+    </a>
+    <a href="https://linkedin.com/in/gaurav-waghmare" target="_blank" rel="noopener" class="btn-secondary">
+      <span class="btn-icon">💼</span> LinkedIn
+    </a>
+    <a href="mailto:gwaghmare8@gmail.com" class="btn-secondary">
+      <span class="btn-icon">✉️</span> Get in Touch
+    </a>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-number">6+</div>
+    <div class="stat-label">Years Experience</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">AWS</div>
+    <div class="stat-label">Certified Cloud Practitioner</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">500+</div>
+    <div class="stat-label">Lines of Terraform IaC</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">99.9%</div>
+    <div class="stat-label">SLA Record</div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">// technical expertise</div>
+  <h2 class="section-title">Skills & Technologies</h2>
+
+  <div class="skills-grid">
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">☁️</div>
+        <div class="skill-card-title">Cloud · AWS</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">EC2</span><span class="tag">VPC</span><span class="tag">S3</span>
+        <span class="tag">RDS</span><span class="tag">IAM</span><span class="tag">Route 53</span>
+        <span class="tag">CloudFront</span><span class="tag">ALB</span><span class="tag">ASG</span>
+        <span class="tag">ACM</span><span class="tag">Secrets Manager</span><span class="tag">SNS</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">🏗️</div>
+        <div class="skill-card-title">Infrastructure as Code</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Terraform</span><span class="tag">Ansible</span>
+        <span class="tag">Modules</span><span class="tag">State Management</span>
+        <span class="tag">Provisioners</span><span class="tag">Playbooks</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">📊</div>
+        <div class="skill-card-title">Monitoring & Observability</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">CloudWatch</span><span class="tag">Metric Alarms</span>
+        <span class="tag">Dashboards</span><span class="tag">SNS Alerting</span>
+        <span class="tag">Slack Webhooks</span><span class="tag">Log Analysis</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">🔒</div>
+        <div class="skill-card-title">Security & Compliance</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Checkov</span><span class="tag">IAM Least-Privilege</span>
+        <span class="tag">Security Groups</span><span class="tag">S3 Bucket Policies</span>
+        <span class="tag">HTTPS/TLS</span><span class="tag">DevSecOps</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">⚙️</div>
+        <div class="skill-card-title">Scripting & Automation</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Bash</span><span class="tag">Python</span>
+        <span class="tag">SQL</span><span class="tag">R</span>
+        <span class="tag">Log Parsing</span><span class="tag">Health Checks</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">🔄</div>
+        <div class="skill-card-title">CI/CD & Version Control</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Git</span><span class="tag">GitHub</span>
+        <span class="tag">Jenkins</span><span class="tag">Pipeline Concepts</span>
+        <span class="tag">Automated Deployments</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">🌐</div>
+        <div class="skill-card-title">Networking & Protocols</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">TCP/IP</span><span class="tag">DNS</span><span class="tag">DHCP</span>
+        <span class="tag">SSH</span><span class="tag">HTTP/HTTPS</span>
+        <span class="tag">VPN</span><span class="tag">Firewalls</span><span class="tag">CCNA</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">🖥️</div>
+        <div class="skill-card-title">Systems & OS</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Linux (Ubuntu)</span><span class="tag">Amazon Linux</span>
+        <span class="tag">RHEL</span><span class="tag">Apache</span>
+        <span class="tag">Windows Server</span><span class="tag">Unix CLI</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-card-header">
+        <div class="skill-icon">📈</div>
+        <div class="skill-card-title">Data & Analytics</div>
+      </div>
+      <div class="skill-tags">
+        <span class="tag">Tableau</span><span class="tag">Power BI</span>
+        <span class="tag">SQL</span><span class="tag">Machine Learning</span>
+        <span class="tag">Data Cleaning</span><span class="tag">Big Data</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURED PROJECT -->
+<section id="projects">
+  <div class="section-label">// featured work</div>
+  <h2 class="section-title">Demo Projects</h2>
+
+  <div class="project-card">
+    <div class="project-card-accent"></div>
+    <div class="project-body">
+      <div class="project-header">
+        <div>
+          <div class="project-title">AWS WordPress Platform · Full Observability Stack</div>
+          <div class="project-subtitle">// capstone · production-grade cloud infrastructure</div>
+        </div>
+        <a href="https://github.com/gwaghmare8" target="_blank" rel="noopener" class="btn-secondary" style="white-space:nowrap">
+          View on GitHub ↗
+        </a>
+      </div>
+
+      <p class="project-desc">
+        End-to-end AWS environment provisioned with 500+ lines of Terraform IaC.
+        Multi-AZ VPC, auto-scaling WordPress deployment, RDS MySQL with private subnet isolation,
+        CloudFront CDN, full CloudWatch observability, and DevSecOps scanning — all infrastructure
+        managed via Git with structured sprint deliverables.
+      </p>
+
+      <div class="project-features">
+        <span class="feature-item">Multi-AZ VPC with public/private subnets</span>
+        <span class="feature-item">Auto Scaling Group (min 1 → max 5 instances)</span>
+        <span class="feature-item">ALB with HTTPS + ACM SSL via Route 53</span>
+        <span class="feature-item">RDS MySQL 8.0 in private subnet</span>
+        <span class="feature-item">CloudFront CDN + S3 media delivery</span>
+        <span class="feature-item">CloudWatch alarms + SNS email alerting</span>
+        <span class="feature-item">Checkov security scanning + Slack alerts</span>
+        <span class="feature-item">AWS Secrets Manager for credentials</span>
+      </div>
+
+      <div class="project-stack">
+        <span class="stack-tag">Terraform</span>
+        <span class="stack-tag">AWS EC2</span>
+        <span class="stack-tag">VPC</span>
+        <span class="stack-tag">RDS</span>
+        <span class="stack-tag">CloudFront</span>
+        <span class="stack-tag">CloudWatch</span>
+        <span class="stack-tag">Route 53</span>
+        <span class="stack-tag">Bash</span>
+        <span class="stack-tag">Checkov</span>
+        <span class="stack-tag">WordPress</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 1.5rem; text-align: center;">
+    <a href="https://github.com/gwaghmare8" target="_blank" rel="noopener" class="btn-secondary">
+      🐙 &nbsp;See all repositories on GitHub ↗
+    </a>
+  </div>
+</section>
+
+<!-- GITHUB BANNER -->
+<div class="github-banner">
+  <div class="github-banner-inner">
+    <div class="banner-text">
+      <h2>Explore My Repositories</h2>
+      <p>github.com/gwaghmare8 &nbsp;·&nbsp; Terraform · Ansible · Python · Bash · CI/CD</p>
+    </div>
+    <a href="https://github.com/gwaghmare8" target="_blank" rel="noopener" class="btn-primary">
+      <span class="btn-icon">🐙</span> Open GitHub Profile
+    </a>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">// get in touch</div>
+  <h2 class="section-title">Contact</h2>
+  <div class="contact-grid">
+    <a href="mailto:gwaghmare8@gmail.com" class="contact-item">
+      <span class="ci-icon">✉️</span> gwaghmare8@gmail.com
+    </a>
+    <a href="https://linkedin.com/in/gaurav-waghmare" target="_blank" rel="noopener" class="contact-item">
+      <span class="ci-icon">💼</span> linkedin.com/in/gaurav-waghmare
+    </a>
+    <a href="https://github.com/gwaghmare8" target="_blank" rel="noopener" class="contact-item">
+      <span class="ci-icon">🐙</span> github.com/gwaghmare8
+    </a>
+    <div class="contact-item" style="cursor:default;">
+      <span class="ci-icon">📍</span> Dublin, Ireland &nbsp;·&nbsp; Stamp 4
+    </div>
+  </div>
+</section>
+
+<footer>
+  gaurav-devops.site &nbsp;·&nbsp; Gaurav Waghmare &nbsp;·&nbsp; Cloud &amp; Infrastructure Engineer
+</footer>
+
+</body>
+</html>
